@@ -2,56 +2,52 @@
     description = "Ashley's environment configuration";
 
     inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+        nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-24.11-darwin";
 
-        # Home Manager
-        home-manager.url = "github:nix-community/home-manager";
-        home-manager.inputs.nixpkgs.follows = "nixpkgs";
+        # Lix
+        lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.0.tar.gz";
+        lix-module.inputs.nixpkgs.follows = "nixpkgs";
 
         # Nix-Darwin
         nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-24.11";
         nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
-        # Lix
-        lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.0.tar.gz";
-        lix-module.inputs.nixpkgs.follows = "nixpkgs";
+        # Home Manager
+        home-manager.url = "github:nix-community/home-manager/release-24.11";
+        home-manager.inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    outputs = { self, nixpkgs, home-manager, nix-darwin, lix-module }@inputs:
+    outputs = { self, nixpkgs, nix-darwin, home-manager, lix-module }@inputs:
     let
-        systems = [
-            "x86_64-darwin"
-            "aarch64-darwin"
-        ];
-        pkgsFor = sys:
-            import nixpkgs {
-                system = sys;
-            };
-        hmMods = [
-            # ./home/core.nix
-        ];
-        currentUser = builtins.getEnv "USER";
+        system = "aarch64-darwin";
     in
     {
-        hmMods = hmMods;
-        ### Standalone Linux Home-Manager Hosts ###
-        homeConfigurations.standaloneLinux = 
-            home-manager.lib.homeManagerConfiguration {
-                pkgs = pkgsFor "x86_64-linux";
-                modules = hmMods;
+        homeModules.default = import ./home/core.nix;
+        darwinModules.default = import ./darwin/darwin.nix;
+        darwinConfigurations.darwin = nix-darwin.lib.darwinSystem {
+            inherit system;
+            pkgs = import nixpkgs {
+                inherit system;
             };
-        ### Nix-Darwin Home-Manager Hosts ###
-        darwinConfigurations.darwin = 
-            nix-darwin.lib.darwinSystem {
-                system = "aarch64-darwin";
-                modules = [
-                    # ./darwin/darwin.nix
-                    home-manager.darwinModules.home-manager
-                    {
-                        home-manager.users.${currentUser}.imports = hmMods;
-                    }
-                ];
-            };
-        
+            modules = [
+                self.darwinModules.default
+                home-manager.darwinModules.home-manager
+                ({pkgs, ...}: {
+                    users.users.ashley = {
+                        home = "/Users/alamont";
+                        shell = pkgs.zsh;
+                    };
+
+                    home-manager = {
+                        useGlobalPkgs = true;
+                        useUserPackages = true;
+
+                        users.ashley.imports = [
+                            self.homeModules.default
+                        ];
+                    };
+                })
+            ];
+        };
     };
 }
