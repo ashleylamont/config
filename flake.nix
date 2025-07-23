@@ -23,6 +23,7 @@
     in
     {
         homeModules.default = import ./home/core.nix;
+        homeDarwinModules.default = import ./home/darwin.nix;
         darwinModules.default = import ./darwin/darwin.nix;
         darwinConfigurations.darwin = nix-darwin.lib.darwinSystem {
             inherit system;
@@ -42,8 +43,11 @@
                         useGlobalPkgs = true;
                         useUserPackages = true;
 
+                        backupFileExtension = "hm-backup";
+
                         users.ashley.imports = [
                             self.homeModules.default
+                            self.homeDarwinModules.default
                         ];
                     };
                 })
