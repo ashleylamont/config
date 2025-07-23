@@ -138,33 +138,7 @@
     programs.starship = {
         enable = true;
         settings = {
-            format = ''
-                [](#9A348E)\
-                $os\
-                $username\
-                [](bg:#DA627D fg:#9A348E)\
-                $directory\
-                [](fg:#DA627D bg:#FCA17D)\
-                $cmd_duration\
-                [](fg:#FCA17D bg:#86BBD8)\
-                $c\
-                $elixir\
-                $elm\
-                $golang\
-                $gradle\
-                $haskell\
-                $java\
-                $julia\
-                $nodejs\
-                $nim\
-                $rust\
-                $scala\
-                [](fg:#86BBD8 bg:#06969A)\
-                $docker_context\
-                [](fg:#06969A bg:#33658A)\
-                $time\
-                [ ](fg:#33658A)\
-            '';
+            format = "[](#9A348E)\\\n$os\\\n$username\\\n[](bg:#DA627D fg:#9A348E)\\\n$directory\\\n[](fg:#DA627D bg:#FCA17D)\\\n$cmd_duration\\\n[](fg:#FCA17D bg:#86BBD8)\\\n$c\\\n$elixir\\\n$elm\\\n$golang\\\n$gradle\\\n$haskell\\\n$java\\\n$julia\\\n$nodejs\\\n$nim\\\n$rust\\\n$scala\\\n[](fg:#86BBD8 bg:#06969A)\\\n$docker_context\\\n[](fg:#06969A bg:#33658A)\\\n$time\\\n[ ](fg:#33658A)\\\n";
             
             add_newline = true;
 
