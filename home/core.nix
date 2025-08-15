@@ -5,16 +5,39 @@
     programs.home-manager.enable = true;
 
     home.packages = with pkgs; [
-        git
-        zsh
-        micro
-        oh-my-zsh
-        starship
+        git # version control
+        zsh # better shell than bash
+        micro # better editor than nano
+        oh-my-zsh # better zsh than zsh
+        starship # zsh prompt / theme
         zsh-autosuggestions
-        zsh-syntax-highlighting
-        eza
-        zoxide
-        thefuck
+        zsh-syntax-highlighting 
+        eza # ls replacement
+        zoxide # cd replacement
+        thefuck # command correction
+        tldr # simplified man pages
+        uv # python env management
+        bat # cat replacement
+        delta # git diff viewer
+        dust # du replacement
+        duf # df replacement
+        broot # tree viewer
+        fzf # fuzzy finder
+        fd # find replacement
+        ripgrep # grep replacement
+        choose # cut/awk alternative
+        jq # json parser
+        bottom # system monitoring
+        glances # process monitoring
+        gping # ping with graph
+        mtr # network diagnostics
+        rustscan # nmap alternative
+        procs # ps replacement
+        httpie # HTTP client
+        curlie # cURL replacement
+        doggo # DNS client
+        zsh-fzf-tab # Fuzzy finder for Zsh autocompletion
+        tokei # SLOC tool
     ];
 
     programs.git = {
