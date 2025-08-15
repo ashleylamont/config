@@ -23,6 +23,14 @@
         userName = "Ashley Lamont";
     };
 
+    programs.atuin = {
+        enable = true;
+        settings = {
+            auto_sync = false;
+            search_mode = "fuzzy";
+        };
+    };
+
     programs.zsh = {
         enable = true;
         autosuggestion.enable = true;
