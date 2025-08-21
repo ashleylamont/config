@@ -2,7 +2,7 @@
     description = "Ashley's environment configuration";
 
     inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-24.11-darwin";
+        nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
 
         # Lix
         lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.0.tar.gz";
@@ -18,24 +18,34 @@
     };
 
     outputs = { self, nixpkgs, nix-darwin, home-manager, lix-module }@inputs:
-    let
-        system = "aarch64-darwin";
-    in
     {
         homeModules.default = import ./home/core.nix;
         homeDarwinModules.default = import ./home/darwin.nix;
         darwinModules.default = import ./darwin/darwin.nix;
+
+        # Home Manager configuration for Fedora (Linux). Does not include any darwin-specific modules.
+        homeConfigurations."linux" = home-manager.lib.homeManagerConfiguration {
+            pkgs = import nixpkgs { system = "x86_64-linux"; };
+            modules = [
+                self.homeModules.default
+                {
+                    home.username = "ashley";
+                    home.homeDirectory = "/home/ashley";
+                }
+            ];
+        };
+
         darwinConfigurations.darwin = nix-darwin.lib.darwinSystem {
-            inherit system;
+            system = "aarch64-darwin";
             pkgs = import nixpkgs {
-                inherit system;
+                system = "aarch64-darwin";
             };
             modules = [
                 self.darwinModules.default
                 home-manager.darwinModules.home-manager
                 ({pkgs, ...}: {
                     users.users.ashley = {
-                        home = "/Users/alamont";
+                        home = "/Users/ashley";
                         shell = pkgs.zsh;
                     };
 
