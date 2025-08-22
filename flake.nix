@@ -60,6 +60,7 @@
                         home = "/Users/ashley";
                         shell = pkgs.zsh;
                     };
+                    system.primaryUser = "ashley";
 
                     home-manager = {
                         useGlobalPkgs = true;
@@ -76,7 +77,7 @@
                     # Manage Homebrew with nix-homebrew
                     nix-homebrew = {
                         enable = true;
-                        enableRosetta = true; # Apple Silicon
+                        # enableRosetta = true; # Apple Silicon
                         user = "ashley";
                         autoMigrate = true;
                     };
