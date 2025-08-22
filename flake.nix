@@ -15,9 +15,20 @@
         # Home Manager
         home-manager.url = "github:nix-community/home-manager/release-24.11";
         home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+        # Nix-homebrew
+        nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+        homebrew-core = {
+            url = "github:homebrew/homebrew-core";
+            flake = false;
+        };
+        homebrew-cask = {
+            url = "github:Homebrew/homebrew-cask";
+            flake = false;
+        };
     };
 
-    outputs = { self, nixpkgs, nix-darwin, home-manager, lix-module }@inputs:
+    outputs = { self, nixpkgs, nix-darwin, home-manager, lix-module, nix-homebrew, ... }@inputs:
     {
         homeModules.default = import ./home/core.nix;
         homeDarwinModules.default = import ./home/darwin.nix;
@@ -43,6 +54,7 @@
             modules = [
                 self.darwinModules.default
                 home-manager.darwinModules.home-manager
+                nix-homebrew.darwinModules.nix-homebrew
                 ({pkgs, ...}: {
                     users.users.ashley = {
                         home = "/Users/ashley";
@@ -59,6 +71,14 @@
                             self.homeModules.default
                             self.homeDarwinModules.default
                         ];
+                    };
+
+                    # Manage Homebrew with nix-homebrew
+                    nix-homebrew = {
+                        enable = true;
+                        enableRosetta = true; # Apple Silicon
+                        user = "ashley";
+                        autoMigrate = true;
                     };
                 })
             ];
