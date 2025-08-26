@@ -45,6 +45,11 @@
         enable = true;
         userEmail = lib.mkDefault "ashley@ashl.dev";
         userName = "Ashley Lamont";
+        extraConfig = {
+            commit.gpgsign = true;
+            tap.gpgSign = true;
+            user.signingKey = "268A2AC24F2B46C1";
+        };
     };
 
     programs.atuin = {
