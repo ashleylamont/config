@@ -39,6 +39,11 @@
         zsh-fzf-tab # Fuzzy finder for Zsh autocompletion
         tokei # SLOC tool
         sapling # Git GUI
+        # Node tooling for CLI and GUI apps
+        nodejs
+        yarn
+        pnpm
+        bun
     ];
 
     programs.git = {
@@ -107,8 +112,8 @@
                 compinit -C
             fi
 
-            # Lazy load slow plugins
-            zstyle ':omz:plugins:nvm' lazy yes
+            # We don't lazy-load nvm anymore as it causes issues with PATH and various applications and tools.
+            zstyle ':omz:plugins:nvm' lazy no
         '';
         initExtra = ''
             # Configure Alias Finder
