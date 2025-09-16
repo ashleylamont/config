@@ -20,4 +20,6 @@
         pkgs.bashInteractive
         pkgs.zsh
     ];
+
+    programs.zsh.enable = true;
 }
