@@ -10,8 +10,25 @@
 
     homebrew = {
         enable = true;
-        # brews = [];
+        brews = [
+            "font-hack-nerd-font"
+        ];
         casks = [
+            "alt-tab"
+            "bartender"
+            "iterm2"
+            "spotify"
+            "visual-studio-code"
+            "middle"
+            "raycast"
+            "spotmenu"
+            "vlc"
+            "docker"
+            "docker-desktop"
+            "mockoon"
+            "scroll-reverser"
+            "stats"
+            "meetingbar"
             "gpg-suite-no-mail"
         ];
     };

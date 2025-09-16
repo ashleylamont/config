@@ -77,7 +77,7 @@
                     # Manage Homebrew with nix-homebrew
                     nix-homebrew = {
                         enable = true;
-                        # enableRosetta = true; # Apple Silicon
+                        enableRosetta = true; # Apple Silicon
                         user = "ashley";
                         autoMigrate = true;
                     };
