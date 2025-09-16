@@ -15,4 +15,9 @@
             "gpg-suite-no-mail"
         ];
     };
+
+    environment.shells = [
+        pkgs.bashInteractive
+        pkgs.zsh
+    ]
 }
