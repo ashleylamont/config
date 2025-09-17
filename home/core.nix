@@ -67,8 +67,8 @@
 
     programs.zsh = {
         envExtra = ''
-          export USER=${USER:-$(id -un)}
-          export LOGNAME=${LOGNAME:-$USER}
+          export USER=''${USER:-$(id -un)}
+          export LOGNAME=''${LOGNAME:-$USER}
 
           if [ -e "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ]; then
             . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
