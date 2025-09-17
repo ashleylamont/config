@@ -105,60 +105,96 @@
         };
         initContent = lib.mkMerge [
             (lib.mkOrder 550 ''
-                # Compinit init (formerly initExtraBeforeCompInit)
+                # Compinit init
                 autoload -Uz compinit
                 if [ "$(date +'%j')" != "$(stat -f '%Sm' -t '%j' ~/.zcompdump 2>/dev/null)" ]; then
                     compinit
                 else
                     compinit -C
                 fi
+
                 # We don't lazy-load nvm anymore as it causes issues with PATH and various applications and tools.
                 zstyle ':omz:plugins:nvm' lazy no
             '')
             (lib.mkOrder 600 ''
-                # Main interactive init (formerly initExtra)
-                zstyle ':omz:plugins:alias-finder' autoload yes
-                zstyle ':omz:plugins:alias-finder' longer yes
-                zstyle ':omz:plugins:alias-finder' cheaper yes
+                # Configure Alias Finder
+            zstyle ':omz:plugins:alias-finder' autoload yes
+            zstyle ':omz:plugins:alias-finder' longer yes
+            zstyle ':omz:plugins:alias-finder' cheaper yes
+            
+            # Use nano as the default editor if SSH_CONNECTION is set, else use micro
+            if [[ -n $SSH_CONNECTION ]]; then
+                export EDITOR='nano'
+            else
+                export EDITOR='micro'
+            fi
+            
+            # Git shortcut functions
+            glatest() {
+                gco $(git_main_branch)
+                gfo $(git_main_branch)
+                gmff
+            }
+            gmupdate () {
+                gfo $(git_main_branch)
+                gmom -m "Updating branch with incoming changes from $(git_main_branch)"
+                echo "Updated $(git_main_branch) with incoming changes via merge, now run gp to push"
+            }
+            grbupdate () {
+                gfo $(git_main_branch)
+                grbom
+                echo "Updated $(git_main_branch) with incoming changes via rebase, now run gp --force to push"
+            }
+            gbranchfiles () {
+                fork_point=$(g merge-base --fork-point $(git_main_branch) $(git_current_branch))}
+                g diff $fork_point HEAD | diffstat -Cm
+            }
+            gbranchdiff () {
+                fork_point=$(g merge-base --fork-point $(git_main_branch) $(git_current_branch))}
+                g diff $fork_point HEAD
+            }
+            gfixfsmonitor () {
+                git config --local core.fsmonitor false
+                git status
+                git config --local core.fsmonitor true
+                git status
+            }
 
-                if [[ -n $SSH_CONNECTION ]]; then
-                    export EDITOR='nano'
-                else
-                    export EDITOR='micro'
+            # Thefuck
+            eval "$(thefuck --alias)"
+
+            # Zoxide
+            eval "$(zoxide init zsh)"
+
+            # Rust init
+            if [[ -f "$HOME/.cargo/env" ]]; then
+                source "$HOME/.cargo/env"
+            fi
+
+            # nvm auto-use
+            autoload -U add-zsh-hook
+
+            load-nvmrc() {
+            local nvmrc_path
+            nvmrc_path="$(nvm_find_nvmrc)"
+
+            if [ -n "$nvmrc_path" ]; then
+                local nvmrc_node_version
+                nvmrc_node_version=$(nvm version "$(cat "''${nvmrc_path}")")
+
+                if [ "$nvmrc_node_version" = "N/A" ]; then
+                nvm install
+                elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
+                nvm use
                 fi
+            elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
+                echo "Reverting to nvm default version"
+                nvm use default
+            fi
+            }
 
-                glatest() { gco $(git_main_branch); gfo $(git_main_branch); gmff; }
-                gmupdate () { gfo $(git_main_branch); gmom -m "Updating branch with incoming changes from $(git_main_branch)"; echo "Updated $(git_main_branch) via merge, now run gp to push"; }
-                grbupdate () { gfo $(git_main_branch); grbom; echo "Updated $(git_main_branch) via rebase, now run gp --force to push"; }
-                gbranchfiles () { fork_point=$(g merge-base --fork-point $(git_main_branch) $(git_current_branch)); g diff $fork_point HEAD | diffstat -Cm; }
-                gbranchdiff () { fork_point=$(g merge-base --fork-point $(git_main_branch) $(git_current_branch)); g diff $fork_point HEAD; }
-                gfixfsmonitor () { git config --local core.fsmonitor false; git status; git config --local core.fsmonitor true; git status; }
-
-                eval "$(thefuck --alias)"
-                eval "$(zoxide init zsh)"
-
-                if [[ -f "$HOME/.cargo/env" ]]; then
-                    source "$HOME/.cargo/env"
-                fi
-
-                autoload -U add-zsh-hook
-                load-nvmrc() {
-                    local nvmrc_path nvmrc_node_version
-                    nvmrc_path="$(nvm_find_nvmrc)"
-                    if [ -n "$nvmrc_path" ]; then
-                        nvmrc_node_version=$(nvm version "$(cat "''${nvmrc_path}")")
-                        if [ "$nvmrc_node_version" = "N/A" ]; then
-                            nvm install
-                        elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
-                            nvm use
-                        fi
-                    elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
-                        echo "Reverting to nvm default version"
-                        nvm use default
-                    fi
-                }
-                add-zsh-hook chpwd load-nvmrc
-                load-nvmrc
+            add-zsh-hook chpwd load-nvmrc
+            load-nvmrc
             '')
         ];
         shellAliases = {
