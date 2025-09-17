@@ -1,19 +1,16 @@
-{self, pkgs, ...}:
+{ config, pkgs, lib, ... }:
 {
-    # environment.systemPackages = [
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-    # ];
-    nix.settings.experimental-features = "nix-command flakes";
-    # system.configurationRevision = self.rev or self.dirtyRev or null;
-    system.stateVersion = 5;
+    system.stateVersion = 5; # nix-darwin state version (keep as-is unless upgrading semantics)
     nixpkgs.hostPlatform = "aarch64-darwin";
 
     homebrew = {
         enable = true;
-        brews = [
-            "font-hack-nerd-font"
-        ];
+        # brews = [
+        # ];
         casks = [
+            "font-hack-nerd-font"
             "alt-tab"
             "bartender"
             "iterm2"

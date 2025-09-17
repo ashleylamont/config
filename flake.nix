@@ -28,11 +28,16 @@
         };
     };
 
-    outputs = { self, nixpkgs, nix-darwin, home-manager, lix-module, nix-homebrew, ... }@inputs:
+    outputs = { self, nixpkgs, nix-darwin, home-manager, lix-module, nix-homebrew, homebrew-core, homebrew-cask, ... }@inputs:
     {
         homeModules.default = import ./home/core.nix;
         homeDarwinModules.default = import ./home/darwin.nix;
         darwinModules.default = import ./darwin/darwin.nix;
+
+        homebrewTaps.default = {
+            "homebrew/homebrew-core" = homebrew-core;
+            "homebrew/homebrew-cask" = homebrew-cask;
+        };
 
         # Home Manager configuration for Fedora (Linux). Does not include any darwin-specific modules.
         homeConfigurations."linux" = home-manager.lib.homeManagerConfiguration {
@@ -52,7 +57,6 @@
                 system = "aarch64-darwin";
             };
             modules = [
-                self.darwinModules.default
                 home-manager.darwinModules.home-manager
                 nix-homebrew.darwinModules.nix-homebrew
                 ({pkgs, ...}: {
@@ -77,11 +81,13 @@
                     # Manage Homebrew with nix-homebrew
                     nix-homebrew = {
                         enable = true;
-                        enableRosetta = true; # Apple Silicon
+                        enableRosetta = false;
                         user = "ashley";
                         autoMigrate = true;
+                        taps = self.homebrewTaps.default;
                     };
                 })
+                self.darwinModules.default
             ];
         };
     };
