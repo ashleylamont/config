@@ -116,7 +116,7 @@
                 # We don't lazy-load nvm anymore as it causes issues with PATH and various applications and tools.
                 zstyle ':omz:plugins:nvm' lazy no
             '')
-            (lib.mkOrder 600 ''
+            (lib.mkOrder 1500 ''
                 # Configure Alias Finder
             zstyle ':omz:plugins:alias-finder' autoload yes
             zstyle ':omz:plugins:alias-finder' longer yes
