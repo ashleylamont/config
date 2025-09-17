@@ -115,9 +115,14 @@
 
                 # We don't lazy-load nvm anymore as it causes issues with PATH and various applications and tools.
                 zstyle ':omz:plugins:nvm' lazy no
+                
+                # Make sure nix profile is loaded
+                if [ -e "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ]; then
+                    . "/nix/var/nix/profiles/default/etc/profile.d/nix.sh"
+                fi
             '')
             (lib.mkOrder 1500 ''
-                # Configure Alias Finder
+            # Configure Alias Finder
             zstyle ':omz:plugins:alias-finder' autoload yes
             zstyle ':omz:plugins:alias-finder' longer yes
             zstyle ':omz:plugins:alias-finder' cheaper yes
