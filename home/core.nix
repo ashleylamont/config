@@ -40,7 +40,8 @@
         tokei # SLOC tool
         sapling # Git GUI
         # Node tooling for CLI and GUI apps
-        nodejs
+        # We ned to override this to 22.17.1 due to some weird compatibility issues
+        (nodejs.override { version = "22.17.1"; hash="sha256-327415fd76fcebb98133bf56e2d90e3ac048b038fac2676f03b6db91074575b9"; })
         yarn
         pnpm
         bun
