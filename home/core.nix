@@ -176,9 +176,7 @@
             }
 
             # Pay Respects (thefuck replacement)
-            eval "$(pay-respects bash --alias)"
             eval "$(pay-respects zsh --alias)"
-            pay-respects fish --alias | source
 
             # Zoxide
             eval "$(zoxide init zsh)"
