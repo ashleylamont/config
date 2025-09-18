@@ -14,7 +14,7 @@
         zsh-syntax-highlighting 
         eza # ls replacement
         zoxide # cd replacement
-        thefuck # command correction
+        pay-respects # command correction (replaces thefuck)
         tldr # simplified man pages
         uv # python env management
         bat # cat replacement
@@ -110,7 +110,6 @@
                 "nvm"
                 "python"
                 "safe-paste"
-                "thefuck"
                 "yarn"
             ];
         };
@@ -176,8 +175,10 @@
                 git status
             }
 
-            # Thefuck
-            eval "$(thefuck --alias)"
+            # Pay Respects (thefuck replacement)
+            eval "$(pay-respects bash --alias)"
+            eval "$(pay-respects zsh --alias)"
+            pay-respects fish --alias | source
 
             # Zoxide
             eval "$(zoxide init zsh)"
