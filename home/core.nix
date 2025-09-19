@@ -42,7 +42,6 @@
         # Node tooling for CLI and GUI apps (standard channel version)
         nodejs
         yarn
-        pnpm
         bun
     ];
 
