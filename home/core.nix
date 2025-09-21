@@ -41,7 +41,6 @@
         sapling # Git GUI
         # Node tooling for CLI and GUI apps (standard channel version)
         nodejs
-        yarn
         bun
     ];
 
@@ -192,6 +191,10 @@
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+            export NVM_DEFAULT="lts/jod"
+            nvm alias default $NVM_DEFAULT
+            nvm install $NVM_DEFAULT
+            nvm use default
 
             # nvm auto-use
             autoload -U add-zsh-hook
@@ -213,8 +216,10 @@
                     echo "Reverting to nvm default version"
                     nvm use default
                 fi
-                # Finally, enable corepack to get yarn/pnpm/bun shims working
-                corepack enable
+                # Finally, enable corepack to get yarn/pnpm/bun shims working (if not using system node)
+                if [ "$(nvm current)" != "system" ]; then
+                    corepack enable
+                fi
             }
 
             add-zsh-hook chpwd load-nvmrc
