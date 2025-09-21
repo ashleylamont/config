@@ -47,6 +47,12 @@
                 {
                     home.username = "ashley";
                     home.homeDirectory = "/home/ashley";
+                    home.sessionPath = [
+                        "/usr/local/cuda/bin"
+                    ];
+                    home.sessionVariables = {
+                        LD_LIBRARY_PATH = "/usr/local/cuda/lib64";
+                    };
                 }
             ];
         };

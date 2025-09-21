@@ -219,8 +219,6 @@
             cd = "z";
             # Modern drop-in-ish replacements
             cat = "bat -pp"; # cat -> bat
-            grep = "rg -n -S --color=auto --hidden --no-ignore-vcs --no-heading"; # grep -> ripgrep
-            fgrep = "rg -n -F --color=auto --hidden --no-ignore-vcs --no-heading"; # fixed-strings grep
             du = "dust"; # du -> dust
             df = "duf"; # df -> duf
             ps = "procs"; # ps -> procs (interactive use)
