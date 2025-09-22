@@ -192,9 +192,14 @@
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
             export NVM_DEFAULT="lts/jod"
-            nvm alias default $NVM_DEFAULT > /dev/null
-            nvm install $NVM_DEFAULT > /dev/null 2>&1 || true
-            nvm use default > /dev/null
+
+            init-nvm() {
+                nvm alias default $NVM_DEFAULT > /dev/null
+                nvm install $NVM_DEFAULT > /dev/null 2>&1 || true
+                nvm use default > /dev/null
+            }
+            init-nvm &
+            
 
             # nvm auto-use
             autoload -U add-zsh-hook
