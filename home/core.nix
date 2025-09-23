@@ -39,8 +39,6 @@
         zsh-fzf-tab # Fuzzy finder for Zsh autocompletion
         tokei # SLOC tool
         sapling # Git GUI
-        # Node tooling for CLI and GUI apps (standard channel version)
-        nodejs
         bun
     ];
 
@@ -199,7 +197,11 @@
                 nvm use default > /dev/null
             }
             init-nvm &
-            
+            if [ -n "$(nvm_find_nvmrc)" ]; then
+                nvm use "$(cat "$(nvm_find_nvmrc)")" > /dev/null 2>&1 || true
+            else
+                nvm use default > /dev/null 2>&1 || true
+            fi
 
             # nvm auto-use
             autoload -U add-zsh-hook
