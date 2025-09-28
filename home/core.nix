@@ -196,7 +196,7 @@
                 nvm install $NVM_DEFAULT > /dev/null 2>&1 || true
                 nvm use default > /dev/null
             }
-            (init-nvm & > /dev/null) > /dev/null 2>&1
+            (init-nvm &>/dev/null) 2>&1 >/dev/null
             if [ -n "$(nvm_find_nvmrc)" ]; then
                 nvm use "$(cat "$(nvm_find_nvmrc)")" > /dev/null 2>&1 || true
             else
