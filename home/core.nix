@@ -40,6 +40,7 @@
         tokei # SLOC tool
         sapling # Git GUI
         bun
+        fnm
     ];
 
     programs.git = {
@@ -103,7 +104,7 @@
                 "history"
                 "man"
                 "npm"
-                "nvm"
+                "fnm"
                 "python"
                 "safe-paste"
                 "yarn"
@@ -119,9 +120,6 @@
                     compinit -C
                 fi
 
-                # We don't lazy-load nvm anymore as it causes issues with PATH and various applications and tools.
-                zstyle ':omz:plugins:nvm' lazy no
-                
                 # Make sure nix profile is loaded
                 if [ -e "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ]; then
                     . "/nix/var/nix/profiles/default/etc/profile.d/nix.sh"
@@ -182,55 +180,11 @@
                 source "$HOME/.cargo/env"
             fi
 
-            # Install nvm if the command is not found
-            if [ -z "$(command -v nvm)" ]; then
-                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-            fi
-            export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-            export NVM_DEFAULT="lts/jod"
-
-            init-nvm() {
-                nvm alias default $NVM_DEFAULT > /dev/null
-                nvm install $NVM_DEFAULT > /dev/null 2>&1 || true
-                nvm use default > /dev/null
-            }
-            (init-nvm &>/dev/null) 2>&1 >/dev/null
-            if [ -n "$(nvm_find_nvmrc)" ]; then
-                nvm use "$(cat "$(nvm_find_nvmrc)")" > /dev/null 2>&1 || true
-            else
-                nvm use default > /dev/null 2>&1 || true
+            # Fast Node Manager (fnm)
+            if command -v fnm >/dev/null 2>&1; then
+                eval "$(fnm env --use-on-cd --shell zsh)"
             fi
 
-            # nvm auto-use
-            autoload -U add-zsh-hook
-
-            load-nvmrc() {
-                local nvmrc_path
-                nvmrc_path="$(nvm_find_nvmrc)"
-
-                if [ -n "$nvmrc_path" ]; then
-                    local nvmrc_node_version
-                    nvmrc_node_version=$(nvm version "$(cat "''${nvmrc_path}")")
-
-                    if [ "$nvmrc_node_version" = "N/A" ]; then
-                    nvm install
-                    elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
-                    nvm use
-                    fi
-                elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
-                    echo "Reverting to nvm default version"
-                    nvm use default
-                fi
-                # Finally, enable corepack to get yarn/pnpm/bun shims working (if not using system node)
-                if [ "$(nvm current)" != "system" ]; then
-                    corepack enable
-                fi
-            }
-
-            add-zsh-hook chpwd load-nvmrc
-            load-nvmrc
             '')
         ];
         shellAliases = {
