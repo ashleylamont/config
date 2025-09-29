@@ -182,7 +182,7 @@
 
             # Fast Node Manager (fnm)
             if command -v fnm >/dev/null 2>&1; then
-                eval "$(fnm env --use-on-cd --shell zsh)"
+                eval "$(fnm env --use-on-cd --shell zsh --corepack-enabled --version-file-strategy=recursive)"
             fi
 
             '')
