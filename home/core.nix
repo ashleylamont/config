@@ -184,6 +184,13 @@
             if command -v fnm >/dev/null 2>&1; then
                 eval "$(fnm env --use-on-cd --shell zsh --corepack-enabled --version-file-strategy=recursive)"
             fi
+            # Set default fnm version if not set
+            CURRENT_FNM_VERSION=$(fnm current 2>/dev/null || echo "none")
+            if [[ "$CURRENT_FNM_VERSION" == "none" ]]; then
+                echo "fnm default version doesn't appear to be set, setting to 22"
+                fnm install 22
+                fnm default 22 --corepack-enabled
+            fi
 
             '')
         ];
