@@ -91,6 +91,7 @@
                         user = "ashley";
                         autoMigrate = true;
                         taps = self.homebrewTaps.default;
+                        mutableTaps = true;
                     };
                 })
                 self.darwinModules.default
