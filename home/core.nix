@@ -45,9 +45,9 @@
 
     programs.git = {
         enable = true;
-        userEmail = lib.mkDefault "ashley@ashl.dev";
-        userName = "Ashley Lamont";
-        extraConfig = {
+        settings = {
+            user.email = lib.mkDefault "ashley@ashl.dev";
+            user.name = "Ashley Lamont";
             commit.gpgsign = true;
             tap.gpgSign = true;
             user.signingKey = lib.mkDefault "B9632522";
