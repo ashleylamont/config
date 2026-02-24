@@ -76,7 +76,7 @@
                         useGlobalPkgs = true;
                         useUserPackages = true;
 
-                        backupFileExtension = "hm-backup";
+                        backupFileExtension = "hm-bak-" + builtins.substring 0 8 (builtins.hashString "sha256" (builtins.toString builtins.currentTime));
 
                         users.ashley.imports = [
                             self.homeModules.default
