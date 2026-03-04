@@ -38,7 +38,6 @@
         doggo # DNS client
         zsh-fzf-tab # Fuzzy finder for Zsh autocompletion
         tokei # SLOC tool
-        sapling # Git GUI
         bun
         fnm
     ];
