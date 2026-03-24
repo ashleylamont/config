@@ -191,6 +191,28 @@
                 fnm default 22 --corepack-enabled
             fi
 
+            # Reset terminal to normal on SSH drop
+            ssh() {
+                command ssh "$@"
+                local exit_code=$?
+                
+                # 255 usually means the connection dropped or failed
+                if [ $exit_code -eq 255 ]; then
+                    # 1. Restore standard keyboard mapping and line formatting
+                    stty sane
+                    
+                    # 2. Send targeted ANSI escape codes to turn off non-standard modes
+                    # Disable Focus Reporting (\e[?1004l)
+                    # Disable Bracketed Paste (\e[?2004l)
+                    # Disable Mouse Tracking (\e[?1000l, \e[?1002l, \e[?1006l)
+                    printf "\033[?1004l\033[?2004l\033[?1000l\033[?1002l\033[?1006l"
+                    
+                    echo -e "\r\n[SSH dropped: Terminal state recovered]"
+                fi
+                
+                return $exit_code
+            }
+
             '')
         ];
         shellAliases = {
