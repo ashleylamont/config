@@ -201,13 +201,14 @@
                     # 1. Restore standard keyboard mapping and line formatting
                     stty sane
                     
-                    # 2. Send targeted ANSI escape codes to turn off non-standard modes
-                    # Disable Focus Reporting (\e[?1004l)
-                    # Disable Bracketed Paste (\e[?2004l)
-                    # Disable Mouse Tracking (\e[?1000l, \e[?1002l, \e[?1006l)
-                    printf "\033[?1004l\033[?2004l\033[?1000l\033[?1002l\033[?1006l"
+                    # 2. Send targeted ANSI escape codes to recover terminal state:
+                    # \033[?25h    -> Show Cursor (Fixes the invisible cursor)
+                    # \033[?1004l  -> Disable Focus Reporting
+                    # \033[?2004l  -> Disable Bracketed Paste
+                    # \033[?1000l, \033[?1002l, \033[?1006l -> Disable Mouse Tracking
+                    printf "\033[?25h\033[?1004l\033[?2004l\033[?1000l\033[?1002l\033[?1006l"
                     
-                    echo -e "\r\n[SSH dropped: Terminal state recovered]"
+                    echo -e "\r\n[SSH dropped: Terminal state recovered, cursor restored]"
                 fi
                 
                 return $exit_code
