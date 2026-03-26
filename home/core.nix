@@ -198,21 +198,25 @@
                 
                 # 255 usually means the connection dropped or failed
                 if [ $exit_code -eq 255 ]; then
-                    # 1. Restore standard keyboard mapping and line formatting
-                    stty sane
+                    # 1. Restore OS-level keyboard mapping and line formatting
+                    stty sane < /dev/tty
                     
-                    # 2. Send targeted ANSI escape codes to recover terminal state:
-                    # \033[?25h    -> Show Cursor (Fixes the invisible cursor)
-                    # \033[?1004l  -> Disable Focus Reporting
-                    # \033[?2004l  -> Disable Bracketed Paste
-                    # \033[?1000l, \033[?1002l, \033[?1006l -> Disable Mouse Tracking
-                    printf "\033[?25h\033[?1004l\033[?2004l\033[?1000l\033[?1002l\033[?1006l"
+                    # 2. Send targeted ANSI escape codes to the terminal emulator
+                    printf "\033[?25h"            # Show Cursor
+                    printf "\033[?1004l"          # Disable Focus Reporting
+                    printf "\033[?2004l"          # Disable Bracketed Paste
+                    printf "\033[?1000l\033[?1002l\033[?1006l" # Disable Mouse Tracking
                     
-                    echo -e "\r\n[SSH dropped: Terminal state recovered, cursor restored]"
+                    # 3. Restore Standard Keyboard and Numpad behavior
+                    printf "\033[?1l"             # Disable Application Cursor Keys
+                    printf "\033>"                # Disable Application Keypad Mode
+                    printf "\033[>4;0m"           # Disable Xterm 'modifyOtherKeys'
+                    printf "\033[=0u"             # Disable modern Kitty Keyboard Protocol
+                    
+                    echo -e "\r\n[SSH dropped: Terminal state recovered, keyboard fixed]"
                 fi
                 
                 return $exit_code
-            }
 
             '')
         ];
