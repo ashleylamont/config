@@ -217,6 +217,7 @@
                 fi
                 
                 return $exit_code
+            }
 
             '')
         ];
