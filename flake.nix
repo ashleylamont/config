@@ -47,10 +47,9 @@
                 {
                     home.username = "ashley";
                     home.homeDirectory = "/home/ashley";
-                    home.sessionPath = [
-                        "/usr/local/cuda/bin"
-                    ];
-                    home.sessionVariables = {
+                    home.sessionPath = nixpkgs.lib.optional (builtins.pathExists "/usr/local/cuda/bin")
+                        "/usr/local/cuda/bin";
+                    home.sessionVariables = nixpkgs.lib.optionalAttrs (builtins.pathExists "/usr/local/cuda/lib64") {
                         LD_LIBRARY_PATH = "/usr/local/cuda/lib64";
                     };
                 }

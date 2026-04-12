@@ -47,8 +47,8 @@
         settings = {
             user.email = lib.mkDefault "ashley@ashl.dev";
             user.name = "Ashley Lamont";
-            commit.gpgsign = true;
-            tap.gpgSign = true;
+            commit.gpgsign = lib.mkDefault true;
+            tag.gpgSign = lib.mkDefault true;
             user.signingKey = lib.mkDefault "B9632522";
         };
     };
@@ -113,7 +113,7 @@
             (lib.mkOrder 550 ''
                 # Compinit init
                 autoload -Uz compinit
-                if [ "$(date +'%j')" != "$(stat -f '%Sm' -t '%j' ~/.zcompdump 2>/dev/null)" ]; then
+                if [ ! -e ~/.zcompdump ] || [ "$(date +'%j')" != "$(date -r ~/.zcompdump +'%j' 2>/dev/null)" ]; then
                     compinit
                 else
                     compinit -C
@@ -154,11 +154,11 @@
                 echo "Updated $(git_main_branch) with incoming changes via rebase, now run gp --force to push"
             }
             gbranchfiles () {
-                fork_point=$(g merge-base --fork-point $(git_main_branch) $(git_current_branch))}
+                fork_point=$(g merge-base --fork-point $(git_main_branch) $(git_current_branch))
                 g diff $fork_point HEAD | diffstat -Cm
             }
             gbranchdiff () {
-                fork_point=$(g merge-base --fork-point $(git_main_branch) $(git_current_branch))}
+                fork_point=$(g merge-base --fork-point $(git_main_branch) $(git_current_branch))
                 g diff $fork_point HEAD
             }
             gfixfsmonitor () {
@@ -219,6 +219,9 @@
                 return $exit_code
             }
 
+            # GPG TTY
+            export GPG_TTY="$(tty)"
+
             '')
         ];
         shellAliases = {
@@ -226,6 +229,14 @@
             ls = "eza -l --group-directories-first --icons --hyperlink --almost-all";
             cd = "z";
         };
+    };
+
+    programs.gpg.enable = true;
+
+    services.gpg-agent = {
+        enable = true;
+        enableZshIntegration = true;
+        pinentry.package = pkgs.pinentry-gtk2;
     };
 
     programs.starship = {
