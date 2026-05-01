@@ -192,9 +192,8 @@
             fi
 
             # Reset terminal to normal on SSH drop
-            ssh() {
-                command ssh "$@"
-                local exit_code=$?
+            _fix_terminal_after_ssh() {
+                local exit_code=$1
                 
                 # 255 usually means the connection dropped or failed
                 if [ $exit_code -eq 255 ]; then
@@ -217,6 +216,10 @@
                 fi
                 
                 return $exit_code
+            }
+            ssh() {
+                command ssh "$@"
+                _fix_terminal_after_ssh $?
             }
 
             # GPG TTY
