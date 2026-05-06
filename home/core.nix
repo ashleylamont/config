@@ -40,6 +40,7 @@
         tokei # SLOC tool
         bun
         fnm
+        ast-grep
     ];
 
     programs.git = {
