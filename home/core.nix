@@ -51,6 +51,10 @@
         ast-grep
     ];
 
+    home.sessionPath = [
+        "${config.home.homeDirectory}/.local/bin"
+    ];
+
     programs.git = {
         enable = true;
         settings = {
@@ -198,6 +202,21 @@
                 echo "fnm default version doesn't appear to be set, setting to 22"
                 fnm install 22
                 fnm default 22 --corepack-enabled
+            fi
+
+            # uv-managed Python
+            path=("$HOME/.local/bin" $path)
+            typeset -U path
+            if command -v uv >/dev/null 2>&1; then
+                _uv_default_python="$HOME/.local/bin/python"
+                _uv_python_dir="$(uv python dir 2>/dev/null || true)"
+                _uv_default_python_target="$(readlink "$_uv_default_python" 2>/dev/null || true)"
+                if [[ -z "$_uv_python_dir" || ! -x "$_uv_default_python" || "$_uv_default_python_target" != "$_uv_python_dir/"* ]]; then
+                    echo "uv default Python doesn't appear to be installed, installing"
+                    uv python install --default --force
+                    rehash
+                fi
+                unset _uv_default_python _uv_python_dir _uv_default_python_target
             fi
 
             # Reset terminal to normal on SSH drop
