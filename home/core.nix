@@ -40,6 +40,14 @@
         tokei # SLOC tool
         bun
         fnm
+        talosctl
+        kubectl
+        kubernetes-helm
+        fluxcd
+        sops
+        age
+        lynx # terminal web browser
+        w3m # terminal html renderer
     ];
 
     programs.git = {
