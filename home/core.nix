@@ -48,6 +48,7 @@
         age
         lynx # terminal web browser
         w3m # terminal html renderer
+        ast-grep
     ];
 
     programs.git = {
@@ -200,9 +201,8 @@
             fi
 
             # Reset terminal to normal on SSH drop
-            ssh() {
-                command ssh "$@"
-                local exit_code=$?
+            _fix_terminal_after_ssh() {
+                local exit_code=$1
                 
                 # 255 usually means the connection dropped or failed
                 if [ $exit_code -eq 255 ]; then
@@ -226,6 +226,10 @@
                 
                 return $exit_code
             }
+            ssh() {
+                command ssh "$@"
+                _fix_terminal_after_ssh $?
+            }
 
             # GPG TTY
             export GPG_TTY="$(tty)"
@@ -244,7 +248,7 @@
     services.gpg-agent = {
         enable = true;
         enableZshIntegration = true;
-        pinentry.package = pkgs.pinentry-gtk2;
+        pinentry.package = lib.mkDefault pkgs.pinentry-gtk2;
     };
 
     programs.starship = {
