@@ -16,7 +16,6 @@
         casks = [
             "font-hack-nerd-font"
             "alt-tab"
-            "bartender"
             "iterm2"
             "visual-studio-code"
             "middle"
