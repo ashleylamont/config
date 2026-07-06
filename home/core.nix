@@ -49,6 +49,7 @@
         lynx # terminal web browser
         w3m # terminal html renderer
         ast-grep
+        github-cli
     ];
 
     home.sessionPath = [
@@ -252,6 +253,73 @@
 
             # GPG TTY
             export GPG_TTY="$(tty)"
+
+            # inside function
+            inside() {
+                local dirs=()
+                local cmd=()
+                local finding_dirs=true
+
+                # 1. Separate target directories from the command
+                for arg in "$@"; do
+                    if $finding_dirs && [[ -d "$arg" ]]; then
+                        dirs+=("$arg")
+                    else
+                        finding_dirs=false
+                        cmd+=("$arg")
+                    fi
+                done
+
+                # Sanity checks
+                if (( ''${#dirs} == 0 )); then
+                    echo "❌ Error: No valid directory specified."
+                    return 1
+                fi
+                if (( ''${#cmd} == 0 )); then
+                    echo "❌ Error: No command specified."
+                    return 1
+                fi
+
+                # 2. Smart Warning for unquoted traps
+                if (( ''${#cmd} > 1 )); then
+                    for arg in "''${cmd[@]}"; do
+                        if [[ "$arg" == *=* ]]; then
+                            echo "⚠️  Warning: Unquoted assignment ('$arg') detected in a multi-word command."
+                            echo "   Variables or substitutions may have evaluated early in your main shell."
+                            echo "   Fix: Wrap the command in single quotes, e.g., inside ./dir 'VAR=\$(command)'"
+                            echo "---"
+                            break
+                        fi
+                    done
+                fi
+
+                # 3. Execution loop across all matched directories
+                local old_pwd="$PWD"
+                for d in "''${dirs[@]}"; do
+                    # If multiple directories matched the wildcard, print a header for clarity
+                    if (( ''${#dirs} > 1 )); then
+                        echo "➔ Inside $d:"
+                    fi
+
+                    cd "$d" || continue
+
+                    {
+                        # If the command is a single string (quoted), eval it to allow complex shell logic
+                        # If it's multiple words (unquoted), execute it directly to preserve spaces safely
+                        if (( ''${#cmd} == 1 )); then
+                            eval "''${cmd[1]}"
+                        else
+                            "''${cmd[@]}"
+                        fi
+                    } always {
+                        # Guarantee we snap back to the original directory after every iteration
+                        cd "$old_pwd"
+                    }
+                done
+            }
+
+            # Keep the directory tab-completion smart
+            compdef '_files -/' inside
 
             '')
         ];
