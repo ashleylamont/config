@@ -8,6 +8,10 @@
         lix-module.url = "https://git.lix.systems/lix-project/nixos-module/archive/2.93.0.tar.gz";
         lix-module.inputs.nixpkgs.follows = "nixpkgs";
 
+        # Herdr - https://herdr.dev/
+        herdr.url = "github:ogulcancelik/herdr";
+        herdr.inputs.nixpkgs.follows = "nixpkgs";
+
         # Nix-Darwin
         nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
         nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
