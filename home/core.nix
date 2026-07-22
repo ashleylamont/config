@@ -6,7 +6,9 @@
 
     # Always overwrite instead of backing up - avoids "would be clobbered by backing up"
     # failures when a stale .hm-bak from a previous switch is still sitting there.
-    home.file.".zshrc".force = true;
+    # Note: home-manager's zsh module keys this file as "./.zshrc" (dotDirRel-prefixed),
+    # not ".zshrc" - using the wrong key creates an empty phantom file entry.
+    home.file."./.zshrc".force = true;
 
     home.packages = with pkgs; [
         git # version control
