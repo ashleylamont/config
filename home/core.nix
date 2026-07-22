@@ -7,8 +7,15 @@
     # Always overwrite instead of backing up - avoids "would be clobbered by backing up"
     # failures when a stale .hm-bak from a previous switch is still sitting there.
     # Note: home-manager's zsh module keys this file as "./.zshrc" (dotDirRel-prefixed),
-    # not ".zshrc" - using the wrong key creates an empty phantom file entry.
-    home.file."./.zshrc".force = true;
+    # not ".zshrc" - using the wrong key creates an empty phantom file entry. The leading
+    # "./" also has to be stripped from `target`, since the activation script's forced-path
+    # check string-concats "$HOME" with the raw `target` value ("$HOME/./.zshrc") and compares
+    # it as a literal prefix against the real target ("$HOME/.zshrc") - the extra "./" makes
+    # the prefix match fail and force is silently ignored otherwise.
+    home.file."./.zshrc" = {
+        force = true;
+        target = ".zshrc";
+    };
 
     home.packages = with pkgs; [
         git # version control
