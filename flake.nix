@@ -32,9 +32,12 @@
         };
     };
 
-    outputs = { self, nixpkgs, nix-darwin, home-manager, lix-module, nix-homebrew, homebrew-core, homebrew-cask, ... }@inputs:
+    outputs = { self, nixpkgs, nix-darwin, home-manager, lix-module, nix-homebrew, homebrew-core, homebrew-cask, herdr, ... }@inputs:
     {
-        homeModules.default = import ./home/core.nix;
+        homeModules.default = { pkgs, ... }: {
+            imports = [ ./home/core.nix ];
+            home.packages = [ herdr.packages.${pkgs.stdenv.hostPlatform.system}.default ];
+        };
         homeDarwinModules.default = import ./home/darwin.nix;
         darwinModules.default = import ./darwin/darwin.nix;
 
