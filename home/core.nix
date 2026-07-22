@@ -4,6 +4,10 @@
     home.stateVersion = "25.05";
     programs.home-manager.enable = true;
 
+    # Always overwrite instead of backing up - avoids "would be clobbered by backing up"
+    # failures when a stale .hm-bak from a previous switch is still sitting there.
+    home.file.".zshrc".force = true;
+
     home.packages = with pkgs; [
         git # version control
         zsh # better shell than bash
