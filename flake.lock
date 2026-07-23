@@ -71,6 +71,56 @@
         "type": "github"
       }
     },
+    "herdr-command-palette": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1782738461,
+        "narHash": "sha256-A43Dl365S/5w2wrttV1RnQ1g7YRJmsD3tb5EUUZcQQY=",
+        "owner": "JanTvrdik",
+        "repo": "herdr-command-palette",
+        "rev": "eab940018c2135ac23718efa11e23e9dddcd2a75",
+        "type": "github"
+      },
+      "original": {
+        "owner": "JanTvrdik",
+        "repo": "herdr-command-palette",
+        "type": "github"
+      }
+    },
+    "herdr-file-viewer-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784585976,
+        "narHash": "sha256-QJM/w1m7j8B433/klHRCRbJKL51/5tkyp7swm0xG3zE=",
+        "owner": "smarzban",
+        "repo": "herdr-file-viewer",
+        "rev": "96fcc0a2bdd2727ec88c38f8c8806f97b7ca0ea0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "smarzban",
+        "ref": "v1.14.0",
+        "repo": "herdr-file-viewer",
+        "type": "github"
+      }
+    },
+    "herdr-reviewr-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784707270,
+        "narHash": "sha256-4+/VXXgwHPbnFkh3xxaZhMYa9w3NPvjkgED8HzNbOpY=",
+        "owner": "persiyanov",
+        "repo": "herdr-reviewr",
+        "rev": "160ad607a195ee35ac9450e887974b3b5ddc4479",
+        "type": "github"
+      },
+      "original": {
+        "owner": "persiyanov",
+        "ref": "v0.22.1",
+        "repo": "herdr-reviewr",
+        "type": "github"
+      }
+    },
     "herdr-worktrunk": {
       "flake": false,
       "locked": {
@@ -249,6 +299,9 @@
     "root": {
       "inputs": {
         "herdr": "herdr",
+        "herdr-command-palette": "herdr-command-palette",
+        "herdr-file-viewer-src": "herdr-file-viewer-src",
+        "herdr-reviewr-src": "herdr-reviewr-src",
         "herdr-worktrunk": "herdr-worktrunk",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",

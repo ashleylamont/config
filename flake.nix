@@ -22,6 +22,28 @@
             flake = false;
         };
 
+        # Herdr plugin: fzf overlay over every installed plugin's actions - https://github.com/JanTvrdik/herdr-command-palette
+        herdr-command-palette = {
+            url = "github:JanTvrdik/herdr-command-palette";
+            flake = false;
+        };
+
+        # Herdr plugin: git-aware file viewer / diff pane - https://github.com/smarzban/herdr-file-viewer
+        # Pinned to the release tag whose prebuilt binary hash is baked in below (see
+        # herdrFileViewerBinary) - bump both together when updating.
+        herdr-file-viewer-src = {
+            url = "github:smarzban/herdr-file-viewer/v1.14.0";
+            flake = false;
+        };
+
+        # Herdr plugin: review an agent's diff and send comments back to it - https://github.com/persiyanov/herdr-reviewr
+        # Pinned to the release tag whose prebuilt binary hash is baked in below (see
+        # herdrReviewrBinary) - bump both together when updating.
+        herdr-reviewr-src = {
+            url = "github:persiyanov/herdr-reviewr/v0.22.1";
+            flake = false;
+        };
+
         # Nix-Darwin
         nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
         nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
@@ -42,22 +64,74 @@
         };
     };
 
-    outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, home-manager, lix-module, nix-homebrew, homebrew-core, homebrew-cask, herdr, herdr-worktrunk, ... }@inputs:
+    outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, home-manager, lix-module, nix-homebrew, homebrew-core, homebrew-cask, herdr, herdr-worktrunk, herdr-command-palette, herdr-file-viewer-src, herdr-reviewr-src, ... }@inputs:
     {
-        homeModules.default = { pkgs, lib, ... }: {
+        homeModules.default = { pkgs, lib, ... }:
+        let
+            system = pkgs.stdenv.hostPlatform.system;
+            herdrBinPath = "${herdr.packages.${system}.default}/bin/herdr";
+
+            # herdr-file-viewer and herdr-reviewr ship prebuilt release binaries, but herdr only
+            # downloads those itself on `plugin install` (which needs network + a mutable managed
+            # checkout) - `plugin link` skips that build step entirely. So we fetch the same
+            # per-platform release asset ourselves and assemble a plugin dir with the binary
+            # already in place, then link that instead of the bare source tree.
+            herdrFileViewerBinary = {
+                aarch64-darwin = pkgs.fetchurl {
+                    url = "https://github.com/smarzban/herdr-file-viewer/releases/download/v1.14.0/herdr-file-viewer-aarch64-apple-darwin";
+                    sha256 = "b2ea1630444ead2be0b824d112452fef747908ff20a2abd11f1f0d011ee9016c";
+                };
+                x86_64-linux = pkgs.fetchurl {
+                    url = "https://github.com/smarzban/herdr-file-viewer/releases/download/v1.14.0/herdr-file-viewer-x86_64-unknown-linux-musl";
+                    sha256 = "65d82dbbde6a4f7844332340a527118011649ac65346ce6b27dad399b733b2ae";
+                };
+            }.${system};
+
+            herdrFileViewerPlugin = pkgs.runCommand "herdr-file-viewer-plugin" { } ''
+                cp -r ${herdr-file-viewer-src} $out
+                chmod -R u+w $out
+                mkdir -p $out/target/release
+                cp ${herdrFileViewerBinary} $out/target/release/herdr-file-viewer
+                chmod +x $out/target/release/herdr-file-viewer
+            '';
+
+            herdrReviewrBinary = {
+                aarch64-darwin = pkgs.fetchurl {
+                    url = "https://github.com/persiyanov/herdr-reviewr/releases/download/v0.22.1/herdr-reviewr-aarch64-apple-darwin.tar.gz";
+                    sha256 = "b97cfcda47619a7cbe0c751cbfe73a9bb8c7364103e2c2d27a9aa9bbbab7b0dc";
+                };
+                x86_64-linux = pkgs.fetchurl {
+                    url = "https://github.com/persiyanov/herdr-reviewr/releases/download/v0.22.1/herdr-reviewr-x86_64-unknown-linux-gnu.tar.gz";
+                    sha256 = "c9df3d7e9a9e7fb053645d58337495772c979d8f4b2dd7592af3ccb01bae11eb";
+                };
+            }.${system};
+
+            herdrReviewrPlugin = pkgs.runCommand "herdr-reviewr-plugin" { } ''
+                cp -r ${herdr-reviewr-src} $out
+                chmod -R u+w $out
+                mkdir -p $out/bin
+                tar -xzf ${herdrReviewrBinary} -C $out/bin
+                chmod +x $out/bin/herdr-reviewr
+            '';
+        in {
             imports = [ ./home/core.nix ];
             home.packages = [
-                herdr.packages.${pkgs.stdenv.hostPlatform.system}.default
-                nixpkgs-unstable.legacyPackages.${pkgs.stdenv.hostPlatform.system}.worktrunk
+                herdr.packages.${system}.default
+                nixpkgs-unstable.legacyPackages.${system}.worktrunk
             ];
 
-            # Registers the herdr-worktrunk plugin (fzf picker for worktrunk worktrees) with herdr.
-            # `plugin link` works offline and re-registers cleanly, so unlink-then-link on every
-            # activation keeps it in sync with the pinned flake input without erroring on relink.
-            home.activation.herdrWorktrunkPlugin = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-                herdrBin="${herdr.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/herdr"
-                $DRY_RUN_CMD "$herdrBin" plugin unlink worktrunk >/dev/null 2>&1 || true
-                $DRY_RUN_CMD "$herdrBin" plugin link ${herdr-worktrunk} $VERBOSE_ARG
+            # Registers each herdr plugin with herdr. `plugin link` works offline and re-registers
+            # cleanly, so unlink-then-link (by manifest id) on every activation keeps them in sync
+            # with their pinned flake inputs/derivations without erroring on relink.
+            home.activation.herdrPlugins = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+                linkHerdrPlugin() {
+                    $DRY_RUN_CMD "${herdrBinPath}" plugin unlink "$1" >/dev/null 2>&1 || true
+                    $DRY_RUN_CMD "${herdrBinPath}" plugin link "$2" $VERBOSE_ARG
+                }
+                linkHerdrPlugin worktrunk ${herdr-worktrunk}
+                linkHerdrPlugin jt.command-palette ${herdr-command-palette}
+                linkHerdrPlugin herdr-file-viewer ${herdrFileViewerPlugin}
+                linkHerdrPlugin persiyanov.reviewr ${herdrReviewrPlugin}
             '';
         };
         homeDarwinModules.default = import ./home/darwin.nix;
