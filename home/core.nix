@@ -32,6 +32,9 @@
         uv # python env management
         bat # cat replacement
         delta # git diff viewer
+        git-machete # git branch stack organizer / rebase & merge automation
+        # worktrunk (wt) comes from nixpkgs-unstable via the flake, see flake.nix -
+        # nixos-26.05's worktrunk is 0.50.0, older than herdr-worktrunk's >=0.60.0 requirement
         dust # du replacement
         duf # df replacement
         broot # tree viewer

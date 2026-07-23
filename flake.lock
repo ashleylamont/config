@@ -71,6 +71,22 @@
         "type": "github"
       }
     },
+    "herdr-worktrunk": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784269504,
+        "narHash": "sha256-rXGlOsL0Bl9AdipCSBmxPoSHObG8IZqaVu7FDXdFZms=",
+        "owner": "devashish2203",
+        "repo": "herdr-worktrunk",
+        "rev": "e9131c0b576fd68635194c758c9691dbfb778b61",
+        "type": "github"
+      },
+      "original": {
+        "owner": "devashish2203",
+        "repo": "herdr-worktrunk",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -214,16 +230,34 @@
         "type": "github"
       }
     },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1784497964,
+        "narHash": "sha256-vlHUuqAcbcH2RKmHbPiuQzbv1pnzzavXnI62RD0bqCU=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "241313f4e8e508cb9b13278c2b0fa25b9ca27163",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "herdr": "herdr",
+        "herdr-worktrunk": "herdr-worktrunk",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "lix-module": "lix-module",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "nixpkgs-unstable": "nixpkgs-unstable"
       }
     },
     "rust-overlay": {
