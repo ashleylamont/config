@@ -60,6 +60,8 @@
         kubectl
         kubernetes-helm
         fluxcd
+        kubeconform # k8s manifest schema validation
+        kube-linter # k8s manifest policy linting
         sops
         age
         lynx # terminal web browser
