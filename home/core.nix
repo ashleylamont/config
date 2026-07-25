@@ -207,6 +207,9 @@
             # Zoxide
             eval "$(zoxide init zsh)"
 
+            # Worktrunk init
+            eval "$(wt config shell init zsh)"
+
             # Rust init
             if [[ -f "$HOME/.cargo/env" ]]; then
                 source "$HOME/.cargo/env"
