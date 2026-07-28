@@ -242,35 +242,54 @@
                 unset _uv_default_python _uv_python_dir _uv_default_python_target
             fi
 
+            # Reset terminal to normal (undoes raw mode, alt-screen leftovers, hidden cursor, etc.)
+            _reset_terminal_state() {
+                # 1. Restore OS-level keyboard mapping and line formatting
+                stty sane < /dev/tty
+
+                # 2. Send targeted ANSI escape codes to the terminal emulator
+                printf "\033[?25h"            # Show Cursor
+                printf "\033[?1004l"          # Disable Focus Reporting
+                printf "\033[?2004l"          # Disable Bracketed Paste
+                printf "\033[?1000l\033[?1002l\033[?1006l" # Disable Mouse Tracking
+
+                # 3. Restore Standard Keyboard and Numpad behavior
+                printf "\033[?1l"             # Disable Application Cursor Keys
+                printf "\033>"                # Disable Application Keypad Mode
+                printf "\033[>4;0m"           # Disable Xterm 'modifyOtherKeys'
+                printf "\033[=0u"             # Disable modern Kitty Keyboard Protocol
+            }
+
             # Reset terminal to normal on SSH drop
             _fix_terminal_after_ssh() {
                 local exit_code=$1
-                
+
                 # 255 usually means the connection dropped or failed
                 if [ $exit_code -eq 255 ]; then
-                    # 1. Restore OS-level keyboard mapping and line formatting
-                    stty sane < /dev/tty
-                    
-                    # 2. Send targeted ANSI escape codes to the terminal emulator
-                    printf "\033[?25h"            # Show Cursor
-                    printf "\033[?1004l"          # Disable Focus Reporting
-                    printf "\033[?2004l"          # Disable Bracketed Paste
-                    printf "\033[?1000l\033[?1002l\033[?1006l" # Disable Mouse Tracking
-                    
-                    # 3. Restore Standard Keyboard and Numpad behavior
-                    printf "\033[?1l"             # Disable Application Cursor Keys
-                    printf "\033>"                # Disable Application Keypad Mode
-                    printf "\033[>4;0m"           # Disable Xterm 'modifyOtherKeys'
-                    printf "\033[=0u"             # Disable modern Kitty Keyboard Protocol
-                    
+                    _reset_terminal_state
                     echo -e "\r\n[SSH dropped: Terminal state recovered, keyboard fixed]"
                 fi
-                
+
                 return $exit_code
             }
             ssh() {
                 command ssh "$@"
                 _fix_terminal_after_ssh $?
+            }
+
+            # Reset terminal state whenever claude/codex exit - both can leave the
+            # terminal in a mangled state (raw mode, hidden cursor, etc.) on crash or Ctrl-C.
+            claude() {
+                command claude "$@"
+                local exit_code=$?
+                _reset_terminal_state
+                return $exit_code
+            }
+            codex() {
+                command codex "$@"
+                local exit_code=$?
+                _reset_terminal_state
+                return $exit_code
             }
 
             # GPG TTY
