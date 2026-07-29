@@ -44,6 +44,11 @@
             flake = false;
         };
 
+        # VS Code Marketplace mirror as a nix package set, so extensions can be
+        # declared by publisher.name without hand-computing marketplace hashes.
+        nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+        nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
+
         # Nix-Darwin
         nix-darwin.url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
         nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
@@ -64,7 +69,7 @@
         };
     };
 
-    outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, home-manager, lix-module, nix-homebrew, homebrew-core, homebrew-cask, herdr, herdr-worktrunk, herdr-command-palette, herdr-file-viewer-src, herdr-reviewr-src, ... }@inputs:
+    outputs = { self, nixpkgs, nixpkgs-unstable, nix-darwin, home-manager, lix-module, nix-homebrew, homebrew-core, homebrew-cask, herdr, herdr-worktrunk, herdr-command-palette, herdr-file-viewer-src, herdr-reviewr-src, nix-vscode-extensions, ... }@inputs:
     {
         homeModules.default = { pkgs, lib, ... }:
         let
@@ -137,6 +142,8 @@
         homeDarwinModules.default = import ./home/darwin.nix;
         darwinModules.default = import ./darwin/darwin.nix;
 
+        overlays.default = nix-vscode-extensions.overlays.default;
+
         homebrewTaps.default = {
             "homebrew/homebrew-core" = homebrew-core;
             "homebrew/homebrew-cask" = homebrew-cask;
@@ -144,7 +151,7 @@
 
         # Home Manager configuration for Fedora (Linux). Does not include any darwin-specific modules.
         homeConfigurations."linux" = home-manager.lib.homeManagerConfiguration {
-            pkgs = import nixpkgs { system = "x86_64-linux"; };
+            pkgs = import nixpkgs { system = "x86_64-linux"; overlays = [ self.overlays.default ]; };
             modules = [
                 self.homeModules.default
                 {
@@ -163,6 +170,9 @@
             system = "aarch64-darwin";
             pkgs = import nixpkgs {
                 system = "aarch64-darwin";
+                overlays = [ self.overlays.default ];
+                # VS Code marketplace extensions are tagged unfree in nixpkgs' license metadata.
+                config.allowUnfree = true;
             };
             modules = [
                 home-manager.darwinModules.home-manager

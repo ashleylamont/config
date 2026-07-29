@@ -68,6 +68,27 @@
         w3m # terminal html renderer
         ast-grep
         github-cli
+
+        dotslash # fetches/executes pinned tool binaries on demand
+        exiftool # image/media metadata
+        expect # scripted interactive program control
+        fastfetch # system info fetch
+        fclones # duplicate file finder
+        ffmpeg # audio/video transcoding
+        git-lfs # git large file storage
+        go
+        hexedit # hex editor
+        hyfetch # pride-flag-themed system info fetch
+        imagemagick # image manipulation
+        pipenv # python env + dependency management
+        # pipx comes from Homebrew (general/darwin/darwin.nix) - nixpkgs' pipx build
+        # currently fails its own test suite on aarch64-darwin from source
+        postgresql_17 # psql client + postgres tooling
+        python3Packages.pygments # syntax highlighting (pygmentize)
+        unison # bidirectional file sync
+        unixodbc # ODBC driver manager
+        watchman # filesystem watching for dev tooling
+        wireguard-tools # wg/wg-quick CLI
     ];
 
     home.sessionPath = [
@@ -83,7 +104,69 @@
             commit.gpgsign = lib.mkDefault true;
             tag.gpgSign = lib.mkDefault true;
             user.signingKey = lib.mkDefault "B9632522";
+
+            core.pager = "less";
+            push.autoSetupRemote = true;
+            init.defaultBranch = "main";
+
+            # Conventional-commit shortcuts, e.g. `git feat -s scope "message"` -> "feat(scope): message"
+            alias = let
+                conventionalCommit = commitType: ''
+                    !a() {
+                    local _scope _attention _message
+                    while [ $# -ne 0 ]; do
+                    case $1 in
+                      -s | --scope )
+                        if [ -z $2 ]; then
+                          echo "Missing scope!"
+                          return 1
+                        fi
+                        _scope="$2"
+                        shift 2
+                        ;;
+                      -a | --attention )
+                        _attention="!"
+                        shift 1
+                        ;;
+                      * )
+                        _message="''${_message} $1"
+                        shift 1
+                        ;;
+                    esac
+                    done
+                    git commit -m "${commitType}''${_scope:+(''${_scope})}''${_attention}:''${_message}"
+                    }; a'';
+            in {
+                build = conventionalCommit "build";
+                chore = conventionalCommit "chore";
+                ci = conventionalCommit "ci";
+                docs = conventionalCommit "docs";
+                feat = conventionalCommit "feat";
+                fix = conventionalCommit "fix";
+                perf = conventionalCommit "perf";
+                refactor = conventionalCommit "refactor";
+                rev = conventionalCommit "revert";
+                style = conventionalCommit "style";
+                test = conventionalCommit "test";
+                wip = conventionalCommit "wip";
+            };
+
+            # Background maintenance schedule applied to any repo registered via
+            # `git maintenance register` (registration itself is per-machine/per-repo,
+            # so it isn't declared here).
+            maintenance = {
+                "commit-graph" = { enabled = true; schedule = "weekly"; };
+                gc.schedule = "weekly";
+                "incremental-repack" = { enabled = true; schedule = "weekly"; };
+                "loose-objects" = { enabled = true; schedule = "weekly"; };
+                prefetch.enabled = false;
+            };
         };
+        ignores = [
+            ".atlassian-local/"
+            "**/.claude/settings.local.json"
+            "**/.claude/.cc-writes/"
+        ];
     };
 
     programs.atuin = {
@@ -514,5 +597,61 @@
                 format = "[$all_status$ahead_behind ]($style)";
             };
         };
+    };
+
+    # Extensions come from the nix-vscode-extensions overlay (see flake.nix) so they
+    # can be pinned/reproduced without hand-fetching marketplace hashes. Internal
+    # Atlassian extensions (atlascode, codelassian, etc.) aren't on the public
+    # marketplace and have to be installed manually inside VS Code instead.
+    programs.vscode = lib.mkIf pkgs.stdenv.isDarwin {
+        enable = true;
+        # The editor itself comes from the Homebrew cask (general/darwin/darwin.nix) -
+        # this only manages extensions/settings, avoiding nixpkgs' unfree vscode build.
+        package = null;
+        profiles.default.extensions = with pkgs.vscode-marketplace; [
+            alefragnani.bookmarks
+            # atlassian-labs.vscode-monorepo-explorer - not present in the marketplace mirror; install manually
+            bbenoist.nix
+            christian-kohler.path-intellisense
+            dbaeumer.vscode-eslint
+            deque-systems.vscode-axe-linter
+            docker.docker
+            dsznajder.es7-react-js-snippets
+            eamodio.gitlens
+            editorconfig.editorconfig
+            esbenp.prettier-vscode
+            formulahendry.auto-rename-tag
+            graphql.vscode-graphql-syntax
+            hiberbee.hiberbee-vscode-theme
+            jnoortheen.nix-ide
+            llvm-vs-code-extensions.lldb-dap
+            meta.relay
+            mhutchie.git-graph
+            ms-azuretools.vscode-containers
+            ms-azuretools.vscode-docker
+            ms-python.debugpy
+            ms-python.python
+            ms-python.vscode-pylance
+            ms-python.vscode-python-envs
+            ms-vscode-remote.remote-containers
+            ms-vscode-remote.remote-ssh
+            ms-vscode-remote.remote-ssh-edit
+            ms-vscode.copilot-mermaid-diagram
+            ms-vscode.extension-test-runner
+            ms-vscode.remote-explorer
+            ms-vscode.vscode-websearchforcopilot
+            ms-vsliveshare.vsliveshare
+            nicoespeon.abracadabra
+            prisma.prisma
+            redhat.vscode-yaml
+            streetsidesoftware.code-spell-checker
+            styled-components.vscode-styled-components
+            stylelint.vscode-stylelint
+            swiftlang.swift-vscode
+            vscode-icons-team.vscode-icons
+            yoavbls.pretty-ts-errors
+            ypresto.vscode-tsserver-trace
+            ziyasal.vscode-open-in-github
+        ];
     };
 }
