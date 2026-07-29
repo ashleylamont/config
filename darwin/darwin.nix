@@ -14,6 +14,7 @@
         brews = [
             "watch" # no cross-platform nixpkgs equivalent on Darwin
             "pipx" # nixpkgs' pipx currently fails its own tests building from source on aarch64-darwin
+            "mas" # required by the Mac App Store casks below (amphetamine, magnet)
         ];
         casks = [
             "font-hack-nerd-font"
