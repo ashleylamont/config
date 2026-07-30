@@ -109,6 +109,11 @@
             push.autoSetupRemote = true;
             init.defaultBranch = "main";
 
+            # Homebrew taps for private GitHub repos (e.g. atlassian/homebrew-cloudtoken)
+            # clone over HTTPS by default, which prompts for a browser login instead of
+            # using the SSH key already set up on the machine. Rewrite to SSH globally.
+            url."ssh://git@github.com/".insteadOf = "https://github.com/";
+
             # Conventional-commit shortcuts, e.g. `git feat -s scope "message"` -> "feat(scope): message"
             alias = let
                 conventionalCommit = commitType: ''
