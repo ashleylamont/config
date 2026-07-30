@@ -21,7 +21,7 @@
         brews = [
             "watch" # no cross-platform nixpkgs equivalent on Darwin
             "pipx" # nixpkgs' pipx currently fails its own tests building from source on aarch64-darwin
-            "mas" # required by the masApps entries below (Amphetamine, Magnet)
+            "mas" # Mac App Store CLI, for the App Store apps noted below
         ];
         casks = [
             "font-hack-nerd-font"
@@ -45,13 +45,14 @@
             "obsidian"
             "jetbrains-toolbox"
         ];
-        # App Store exclusives — there is no homebrew-cask for either, so listing
-        # them under `casks` just made `brew bundle` fail resolution. `mas install`
-        # only works for apps already in this Apple ID's purchase history.
-        masApps = {
-            "Amphetamine" = 937984704;
-            "Magnet" = 441258766;
-        };
+        # Amphetamine (937984704) and Magnet (441258766) are App Store exclusives —
+        # no homebrew-cask exists for either, so they can't be `casks`. They were
+        # briefly `masApps`, but `mas install` needs the app to already be in this
+        # Apple ID's purchase history; for anything else it hangs indefinitely
+        # inside its own `sudo` without ever starting the download, which takes the
+        # whole activation (and home-manager, which runs after the Homebrew bundle)
+        # down with it. Install both from the App Store by hand, then a masApps
+        # block becomes a safe no-op if you want them declared here.
     };
 
     system.defaults = {
