@@ -1,5 +1,12 @@
 { config, pkgs, lib, ... }:
 {
+    # macOS installs Nix via the Determinate installer, which manages its own
+    # nix-daemon/nix.conf. nix-darwin's built-in Nix management conflicts with
+    # that (both trying to own the daemon plist and /etc/nix/nix.conf), so it
+    # must be disabled here. This also makes nix.settings below a no-op for
+    # nix.conf generation - Determinate already enables nix-command/flakes by
+    # default, so it's kept only as documentation of the expected settings.
+    nix.enable = false;
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     system.stateVersion = 5; # nix-darwin state version (keep as-is unless upgrading semantics)
