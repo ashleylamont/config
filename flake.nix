@@ -57,7 +57,15 @@
         home-manager.url = "github:nix-community/home-manager/release-26.05";
         home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-        # Nix-homebrew
+        # Nix-homebrew.
+        #
+        # nix-homebrew pins the brew source itself (its brew-src input), so brew's
+        # version is set by *this* input, not by the tap inputs below. Never bump
+        # homebrew-core/homebrew-cask past nix-homebrew: formulae start using DSL
+        # the older brew doesn't have and fail to import wholesale, e.g.
+        # "undefined method 'type' for an instance of Resource::Patch" or
+        # "Patch cannot use `directory` with `file`". Update nix-homebrew first, or
+        # update all three together.
         nix-homebrew.url = "github:zhaofengli/nix-homebrew";
         homebrew-core = {
             url = "github:homebrew/homebrew-core";
