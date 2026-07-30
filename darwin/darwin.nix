@@ -42,7 +42,6 @@
             "bruno"
             "keycastr"
             "pgadmin4"
-            "spotify" # cask has occasionally had signing issues - watch for install failures
             "obsidian"
             "amphetamine" # Mac App Store app - cask install needs `mas` + an authenticated App Store session
             "magnet" # Mac App Store app - cask install needs `mas` + an authenticated App Store session
