@@ -21,7 +21,7 @@
         brews = [
             "watch" # no cross-platform nixpkgs equivalent on Darwin
             "pipx" # nixpkgs' pipx currently fails its own tests building from source on aarch64-darwin
-            "mas" # required by the Mac App Store casks below (amphetamine, magnet)
+            "mas" # required by the masApps entries below (Amphetamine, Magnet)
         ];
         casks = [
             "font-hack-nerd-font"
@@ -43,10 +43,15 @@
             "keycastr"
             "pgadmin4"
             "obsidian"
-            "amphetamine" # Mac App Store app - cask install needs `mas` + an authenticated App Store session
-            "magnet" # Mac App Store app - cask install needs `mas` + an authenticated App Store session
             "jetbrains-toolbox"
         ];
+        # App Store exclusives — there is no homebrew-cask for either, so listing
+        # them under `casks` just made `brew bundle` fail resolution. `mas install`
+        # only works for apps already in this Apple ID's purchase history.
+        masApps = {
+            "Amphetamine" = 937984704;
+            "Magnet" = 441258766;
+        };
     };
 
     system.defaults = {
