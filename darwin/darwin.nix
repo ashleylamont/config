@@ -45,14 +45,25 @@
             "obsidian"
             "jetbrains-toolbox"
         ];
-        # Amphetamine (937984704) and Magnet (441258766) are App Store exclusives —
-        # no homebrew-cask exists for either, so they can't be `casks`. They were
-        # briefly `masApps`, but `mas install` needs the app to already be in this
-        # Apple ID's purchase history; for anything else it hangs indefinitely
-        # inside its own `sudo` without ever starting the download, which takes the
-        # whole activation (and home-manager, which runs after the Homebrew bundle)
-        # down with it. Install both from the App Store by hand, then a masApps
-        # block becomes a safe no-op if you want them declared here.
+        # App Store exclusives — neither has a homebrew-cask, so they can't be
+        # `casks`. These entries are only ever no-ops: `brew bundle` checks
+        # app_id_installed? first and skips without invoking mas at all.
+        #
+        # They cannot perform a *first* install during activation. mas escalates
+        # before doing anything — AppStoreAction.swift does
+        #     guard getuid() == 0 else { try sudo(...); return }
+        # spawning `sudo <mas> install --force <id>` and blocking on waitpid with
+        # no timeout. During activation the Homebrew bundle is already inside
+        # `sudo --user=...` with no usable tty, so that inner sudo never
+        # authenticates and the whole switch wedges — taking home-manager, which
+        # runs after the bundle, with it.
+        #
+        # To install a new one: `sudo mas install <id>` by hand. Being root
+        # already skips the re-spawn, so it just works.
+        masApps = {
+            "Amphetamine" = 937984704;
+            "Magnet" = 441258766;
+        };
     };
 
     system.defaults = {
