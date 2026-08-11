@@ -27,6 +27,7 @@
             "font-hack-nerd-font"
             "font-commit-mono-nerd-font"
             "alt-tab"
+            "alcove"
             "iterm2"
             "visual-studio-code"
             "middle"
