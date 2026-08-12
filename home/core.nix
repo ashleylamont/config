@@ -211,7 +211,6 @@
                 "alias-finder"
                 "aliases"
                 "brew"
-                "bun"
                 "catimg"
                 "colored-man-pages"
                 "colorize"
@@ -224,28 +223,14 @@
                 "history"
                 "man"
                 "npm"
-                "fnm"
                 "python"
                 "safe-paste"
                 "yarn"
             ];
         };
-        initContent = lib.mkMerge [
-            (lib.mkOrder 550 ''
-                # Compinit init
-                autoload -Uz compinit
-                if [ ! -e ~/.zcompdump ] || [ "$(date +'%j')" != "$(date -r ~/.zcompdump +'%j' 2>/dev/null)" ]; then
-                    compinit
-                else
-                    compinit -C
-                fi
-
-                # Make sure nix profile is loaded
-                if [ -e "/nix/var/nix/profiles/default/etc/profile.d/nix.sh" ]; then
-                    . "/nix/var/nix/profiles/default/etc/profile.d/nix.sh"
-                fi
-            '')
-            (lib.mkOrder 1500 ''
+        # Oh My Zsh owns completion initialisation. Inputs that extend fpath
+        # should do so at an earlier order rather than invoking compinit again.
+        initContent = lib.mkOrder 1500 ''
             # Configure Alias Finder
             zstyle ':omz:plugins:alias-finder' autoload yes
             zstyle ':omz:plugins:alias-finder' longer yes
@@ -450,8 +435,7 @@
             # Keep the directory tab-completion smart
             compdef '_files -/' inside
 
-            '')
-        ];
+        '';
         shellAliases = {
             # Default command replacements
             ls = "eza -l --group-directories-first --icons --hyperlink --almost-all";
