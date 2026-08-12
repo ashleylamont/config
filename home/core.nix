@@ -8,6 +8,8 @@ let
         ${lib.getExe pkgs.zoxide} init zsh > "$out"
     '';
     atuinZshInit = pkgs.runCommand "atuin-zsh-init" { } ''
+        export HOME="$TMPDIR/home"
+        mkdir -p "$HOME/.config/atuin"
         ${lib.getExe pkgs.atuin} init zsh > "$out"
     '';
 in
