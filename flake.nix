@@ -133,6 +133,14 @@
                 nixpkgs-unstable.legacyPackages.${system}.worktrunk
             ];
 
+            # Generate Worktrunk's static shell wrapper at build time. Runtime
+            # behavior, directory switching, and lazy completions are unchanged.
+            home.file.".cache/shell-init/worktrunk.zsh".source =
+                pkgs.runCommand "worktrunk-zsh-init" { } ''
+                    ${nixpkgs-unstable.legacyPackages.${system}.worktrunk}/bin/wt \
+                        config shell init zsh > "$out"
+                '';
+
             # Registers each herdr plugin with herdr. `plugin link` works offline and re-registers
             # cleanly, so unlink-then-link (by manifest id) on every activation keeps them in sync
             # with their pinned flake inputs/derivations without erroring on relink.

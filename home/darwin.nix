@@ -1,5 +1,9 @@
 {config, pkgs, lib, ...}:
 {
+    # Homebrew is installed at the native Apple Silicon prefix. Declaring it
+    # avoids the Oh My Zsh brew plugin spawning `brew --prefix` in every shell.
+    home.sessionVariables.HOMEBREW_PREFIX = "/opt/homebrew";
+
     # Use native macOS pinentry (from GPG Suite) so GUI apps like WebStorm,
     # GitButler, etc. can trigger the passphrase dialog without needing X11/GTK.
     services.gpg-agent.pinentry.package = pkgs.pinentry_mac;
