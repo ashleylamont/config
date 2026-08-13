@@ -14,6 +14,10 @@
 
     homebrew = {
         enable = true;
+        # Home Manager exports the native prefix and Oh My Zsh's brew plugin
+        # adds its completion path before its single compinit invocation.
+        # Avoid running `brew shellenv` again in every interactive shell.
+        enableZshIntegration = false;
         onActivation = {
             autoUpdate = false;
             upgrade = true;
@@ -66,6 +70,10 @@
         };
     };
 
+    # nix-homebrew also enables its own `brew shellenv` hook by default.
+    # HOMEBREW_PREFIX and PATH are already provided declaratively.
+    nix-homebrew.enableZshIntegration = false;
+
     system.defaults = {
         dock = {
             autohide = true;
@@ -90,5 +98,14 @@
         pkgs.zsh
     ];
 
-    programs.zsh.enable = true;
+    programs.zsh = {
+        enable = true;
+
+        # Home Manager/Oh My Zsh owns the prompt and completion lifecycle.
+        # Running nix-darwin's defaults first duplicates compinit (including a
+        # separate unversioned dump) and makes cold terminal startup expensive.
+        enableGlobalCompInit = false;
+        enableBashCompletion = false;
+        promptInit = "";
+    };
 }
