@@ -3,6 +3,12 @@
     # Homebrew is installed at the native Apple Silicon prefix. Declaring it
     # avoids the Oh My Zsh brew plugin spawning `brew --prefix` in every shell.
     home.sessionVariables.HOMEBREW_PREFIX = "/opt/homebrew";
+    # nix-homebrew's dynamic `brew shellenv` integration is disabled in the
+    # Darwin module, so provide its executable paths declaratively as well.
+    home.sessionPath = [
+        "/opt/homebrew/bin"
+        "/opt/homebrew/sbin"
+    ];
 
     # Use native macOS pinentry (from GPG Suite) so GUI apps like WebStorm,
     # GitButler, etc. can trigger the passphrase dialog without needing X11/GTK.
