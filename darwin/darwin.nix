@@ -49,25 +49,14 @@
             "obsidian"
             "jetbrains-toolbox"
         ];
-        # App Store exclusives — neither has a homebrew-cask, so they can't be
-        # `casks`. These entries are only ever no-ops: `brew bundle` checks
-        # app_id_installed? first and skips without invoking mas at all.
-        #
-        # They cannot perform a *first* install during activation. mas escalates
-        # before doing anything — AppStoreAction.swift does
-        #     guard getuid() == 0 else { try sudo(...); return }
-        # spawning `sudo <mas> install --force <id>` and blocking on waitpid with
-        # no timeout. During activation the Homebrew bundle is already inside
-        # `sudo --user=...` with no usable tty, so that inner sudo never
-        # authenticates and the whole switch wedges — taking home-manager, which
-        # runs after the bundle, with it.
-        #
-        # To install a new one: `sudo mas install <id>` by hand. Being root
-        # already skips the re-spawn, so it just works.
-        masApps = {
-            "Amphetamine" = 937984704;
-            "Magnet" = 441258766;
-        };
+        # MAS discovers installed apps through Spotlight. If its index is stale,
+        # `mas list` reports no apps and Homebrew Bundle attempts to reinstall
+        # them. Guard the MAS entries with the application bundles themselves;
+        # missing apps are still installed through MAS on a fresh machine.
+        extraConfig = ''
+            mas "Amphetamine", id: 937984704 unless File.directory?("/Applications/Amphetamine.app")
+            mas "Magnet", id: 441258766 unless File.directory?("/Applications/Magnet.app")
+        '';
     };
 
     # nix-homebrew also enables its own `brew shellenv` hook by default.
