@@ -24,9 +24,21 @@
             ];
         };
         shellAliases = {
+            # Homebrew upgrades are deliberately separate from darwin-rebuild.
+            brew-maintain = "brew upgrade --greedy && brew cleanup";
             # MacOS DNS
             flushdns = "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder";
         };
+        initContent = lib.mkOrder 2000 ''
+            # Re-exec a login shell after a Home Manager or nix-darwin switch.
+            # Long-lived terminal servers otherwise retain the old PATH and
+            # session-variable sentinels in their process environment.
+            reload-shell() {
+                unset __HM_SESS_VARS_SOURCED __HM_ZSH_SESS_VARS_SOURCED
+                unset __NIX_DARWIN_SET_ENVIRONMENT_DONE
+                exec "''${SHELL:-/bin/zsh}" -l
+            }
+        '';
     };
 
     # iTerm2 Dynamic Profile - captures the colors/font/keyboard map from the

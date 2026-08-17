@@ -20,7 +20,9 @@
         enableZshIntegration = false;
         onActivation = {
             autoUpdate = false;
-            upgrade = true;
+            # Keep system activation deterministic. Upgrade formulae and casks
+            # explicitly with the `brew-maintain` shell helper instead.
+            upgrade = false;
         };
         brews = [
             "watch" # no cross-platform nixpkgs equivalent on Darwin

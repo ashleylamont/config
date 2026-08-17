@@ -2,7 +2,10 @@
 
 let
     payRespectsZshInit = pkgs.runCommand "pay-respects-zsh-init" { } ''
-        ${lib.getExe pkgs.pay-respects} zsh --alias > "$out"
+        # Keep the explicit `f` alias and inline correction widget, but do not
+        # replace Zsh's global command-not-found handler. An internal missing
+        # command must never turn prompt rendering into an interactive wait.
+        ${lib.getExe pkgs.pay-respects} zsh --alias --nocnf > "$out"
     '';
     zoxideZshInit = pkgs.runCommand "zoxide-zsh-init" { } ''
         ${lib.getExe pkgs.zoxide} init zsh > "$out"
@@ -371,9 +374,6 @@ in
                 _reset_terminal_state
                 return $exit_code
             }
-
-            # GPG TTY
-            export GPG_TTY="$(tty)"
 
             # inside function
             inside() {
